@@ -1,0 +1,17 @@
+{
+    "name": "Scrap police data",
+    "version": "1.0.0",
+    "description": "scrap police data by area",
+    "manifest_version": 3,
+    "author": "Nigel Mack",
+    "permissions": [
+    	"activeTab",
+    	"scripting",
+	"webRequest",
+    	"<all_urls>"
+    ],
+    "action":{
+        "default_popup": "home.html",
+        "default_title": "Police data"
+    }
+}
