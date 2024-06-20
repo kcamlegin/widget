@@ -1,6 +1,8 @@
 let new_location = '';
 let new_town = '';
 let new_dr = [];
+let prev_town = '';
+let counter = 0;
 
 function jsonToCsv(jsonData) {
     let csv = '';
@@ -37,8 +39,14 @@ function download(data, townname) {
     // Create a URL for the Blob
     const url = URL.createObjectURL(blob);
 
+    townname===prev_town ? counter++ : counter = 0;
+
+    const subscript = counter ? `(${counter})`: ''; 
+ 
     // Create an anchor tag for downloading
-    const a = { href: url, download: `${townname}.csv`, textContent: `${townname}.csv`}
+    const a = { href: url, download: `${townname}${subscript}.csv`, textContent: `${townname}${subscript}.csv`};
+
+    prev_town = townname;
 
     return a;
 }
@@ -122,7 +130,7 @@ document.getElementById('dater-form').addEventListener('submit', (event) => {
                         const location_nm = Array.from(document.body.getElementsByTagName('script')).find(el => el.innerText.includes('window.jsonModel'));
                         const location_nm1 = JSON.parse(location_nm.innerText.replace('window.jsonModel = ', ''));
                         const res_town = location_nm1.shortLocationDescription.replace('in','');
-                        chrome.runtime.sendMessage({ result: location_nm1.locationPolygon, result_town: res_town});
+			chrome.runtime.sendMessage({ result: location_nm1.radiusPolygon||location_nm1.locationPolygon, result_town: res_town});
                     }
                 });
             }
@@ -137,7 +145,7 @@ chrome.webRequest.onCompleted.addListener(
         fetch(details.url)
             .then(response => response.json())
             .then(data => {
-                new_location = data.locationPolygon;
+                new_location = data.radiusPolygon||data.locationPolygon ;
 		new_town = data.shortLocationDescription.replace('in','');
             })
             .catch(error => console.error('Error fetching data:', error));
