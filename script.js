@@ -2,17 +2,18 @@ let new_location = '';
 let new_town = '';
 let new_dr = [];
 
-function jsonToCsv(jsonData) {
+function jsonToCsv(jsonData, header) {
     let csv = '';
 
     // Extract headers
-    const headers = jsonData.map(a=>Object.keys(a)).flat();
-    const headers1 = Array.from(new Set(headers));
-    csv += headers1.join(',') + '\n';
+    const headers = Object.keys(jsonData[0]);
+    if (!header) {
+        csv += headers.join(',') + '\n';
+    }
 
     // Extract values
     jsonData.forEach(obj => {
-        const values = headers1.map(header => obj[header]);
+        const values = headers.map(header => obj[header]);
         csv += values.join(',') + '\n';
     });
 
