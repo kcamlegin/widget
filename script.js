@@ -46,11 +46,18 @@ function download(data, townname) {
 
 async function fetchdata(coordinates, date_range, town_name) {
     let datajson = [];
-    
-    datajson = await Promise.all(date_range.map(a_date=>a_response(coordinates,a_date)));
-    const flattenedData = datajson.flat();
-
-    const datacsv = jsonToCsv(flattenedData);
+    for (let date of date_range) {
+        try {
+	    console.log(`https://data.police.uk/api/crimes-street/all-crime?poly=${coordinates}&date=${date}`);
+            const response = await fetch(`https://data.police.uk/api/crimes-street/all-crime?poly=${coordinates}&date=${date}`);
+            const data = await response.json();
+            const flattenedData = data.map(item => flattenJSON(item));
+            datajson.push(...flattenedData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+    const datacsv = jsonToCsv(datajson);
     const a_link = download(datacsv, town_name);
     const a_tag = document.getElementById('link');
     Object.assign(a_tag, a_link);  // Destructure assignment to set href, download, and textContent
