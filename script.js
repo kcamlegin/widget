@@ -2,17 +2,18 @@ let new_location = '';
 let new_town = '';
 let new_dr = [];
 
-function jsonToCsv(jsonData) {
+function jsonToCsv(jsonData, header) {
     let csv = '';
 
     // Extract headers
-    const headers = jsonData.map(a=>Object.keys(a)).flat();
-    const headers1 = Array.from(new Set(headers));
-    csv += headers1.join(',') + '\n';
+    const headers = Object.keys(jsonData[0]);
+    if (!header) {
+        csv += headers.join(',') + '\n';
+    }
 
     // Extract values
     jsonData.forEach(obj => {
-        const values = headers1.map(header => obj[header]);
+        const values = headers.map(header => obj[header]);
         csv += values.join(',') + '\n';
     });
 
@@ -53,12 +54,18 @@ function a_response(coordinates,date){
 
 
 async function fetchdata(coordinates, date_range, town_name) {
-    let datajson = [];
-    
-    datajson = await Promise.all(date_range.map(a_date=>a_response(coordinates,a_date)));
-    const flattenedData = datajson.flat();
+    let datacsv = '';
+    for (let date of date_range) {
+        try {
+            const response = await fetch(`https://data.police.uk/api/crimes-street/all-crime?poly=${coordinates}&date=${date}`);
+            const data = await response.json();
+            const flattenedData = data.map(item => flattenJSON(item));
+            datacsv += jsonToCsv(flattenedData, datacsv);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
 
-    const datacsv = jsonToCsv(flattenedData);
     const a_link = download(datacsv, town_name);
     const a_tag = document.getElementById('link');
     Object.assign(a_tag, a_link);  // Destructure assignment to set href, download, and textContent
