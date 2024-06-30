@@ -69,3 +69,19 @@ async function fetchdata(coordinates, date_range, town_name) {
     const a_tag = document.getElementById('link');
     Object.assign(a_tag, a_link);  // Destructure assignment to set href, download, and textContent
 }
+
+function getMonthsBetween(startDate, endDate) {
+    const result = [];
+    const start = new Date(startDate + '-01'); // Add '-01' to convert to a valid date string
+    const end = new Date(endDate + '-01');
+    const current = new Date(start);
+
+    while (current <= end) {
+        const year = current.getFullYear();
+        const month = String(current.getMonth() + 1).padStart(2, '0');
+        result.push(`${year}-${month}`);
+        current.setMonth(current.getMonth() + 1);
+    }
+
+    return result;
+}

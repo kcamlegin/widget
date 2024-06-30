@@ -5,41 +5,15 @@ let prev_town = '';
 let counter = 0;
 
 
-document.getElementById('dater-form').addEventListener('submit', (event) => {
+document.getElementById('new-button').addEventListener('click', () => {
     // Prevent the form from submitting the default way
-    event.preventDefault();
-
-    console.log('form submitted');
-
-    // Reference the form element
-    const form = event.target;
-
     let temp = [];
     // Get the selected value from the select element
-    const selectedValue = parseInt(form.elements['yourSelectName'].value, 10);
-
-    // Generate dates based on the selected value
-    if (selectedValue === 1) {
-        temp = [-1].map(e => {
-            let newdate = new Date();
-            newdate.setMonth(newdate.getMonth() + e); // Subtract the months
-            return getFormattedDate(newdate);
-        });
-    } else if (selectedValue === 2) {
-        temp = [-1, -2, -3, -4, -5, -6].map(e => {
-            let newdate = new Date();
-            newdate.setMonth(newdate.getMonth() + e); // Subtract the months
-            return getFormattedDate(newdate);
-        });
-    } else {
-        temp = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12].map(e => {
-            let newdate = new Date();
-            newdate.setMonth(newdate.getMonth() + e); // Subtract the months
-            return getFormattedDate(newdate);
-        });
-    }
-
-    new_dr = temp;
+    const start_dt = document.getElementById('start').value;
+    const end_dt = document.getElementById('end').value;
+    
+    new_dr = getMonthsBetween(start_dt, end_dt);
+    console.log(new_dr);
 
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         console.log('Active tab queried'); // Debug log
@@ -78,6 +52,7 @@ chrome.webRequest.onCompleted.addListener(
     },
     { urls: ["https://www.rightmove.co.uk/api/_mapSearch?locationIdentifier*"] }
 );
+
 
 // Handle messages from content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
